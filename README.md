@@ -1,6 +1,6 @@
 # STEM MODULE
 
-# Word Embedding Operations with FastText
+# Word Embedding Operations with FastText for Episodic Memory Studies
 
 This repository contains Python code for working with word embeddings using the FastText library. It includes functions for loading FastText models, calculating cosine similarity between words, generating similar and dissimilar word lists, and more.
 
