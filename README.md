@@ -58,6 +58,7 @@ fastText is licensed under the MIT License - see the LICENSE file for details.
 - FastText
 - Numpy
 - Pandas
+## Author
 - Barbaros YET
 - Burak BÜYÜKYAPRAK
 - GitHub: https://github.com/neoburak
