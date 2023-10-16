@@ -52,7 +52,7 @@ show_diagnosis function can be used to diagnose the cosine similarity between di
 making_list_and_print function groups words into lists and can print them or write them to a file.
 
 ## License
-fastText is licensed under the MIT License - see the LICENSE file for details.
+fastText is licensed under the MIT License
 
 ## Acknowledgments
 - FastText
