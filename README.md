@@ -60,6 +60,7 @@ fastText is licensed under the MIT License - see the LICENSE file for details.
 - Pandas
 ## Author
 - Barbaros YET
+- GitHub: https://github.com/byet
 - Burak BÜYÜKYAPRAK
 - GitHub: https://github.com/neoburak
 
