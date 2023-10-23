@@ -13,6 +13,8 @@ from itertools import permutations,combinations
 from numpy.linalg import norm
 import math
 import random
+from transformers import AutoModel, AutoTokenizer, BertTokenizer
+import torch
 
 
 # In[2]:
@@ -35,6 +37,8 @@ def loadModel(keyword):
 
 
 # In[3]:
+
+
 
 
 def getWordList(keyword):
@@ -297,7 +301,7 @@ if __name__ == "__main__":
 # In[50]:
 
 
-def show_diagnosis(model_name,word_list):
+def show_diagnosis(model_name,word_list,sort_ascending=False):
     temp=[]
     """   
     Parameters:
@@ -308,10 +312,16 @@ def show_diagnosis(model_name,word_list):
             If word list, distances between words in the form of numpy array and provided, returns similar list determined 
             number  of  items.
     NOTE: before using show_diagnosis function you must 
-    """      
-    for a,b in combinations(word_list,2):
-      temp.append((a,b,cosine_similarity(model_name[a],model_name[b])))
-    return temp
+    """  
+    if sort_ascending== False:
+        for a,b in combinations(word_list,2):
+          temp.append((a,b,cosine_similarity(model_name[a],model_name[b])))
+        return temp
+    if sort_ascending == True:
+        for a,b in combinations(word_list,2):
+          temp.append((a,b,cosine_similarity(model_name[a],model_name[b])))
+        sorted_items =  sorted(temp, key=lambda x: x[2])
+        return sorted_items
 
 
 # ## Sonuçları Görüntüleme ve Yazdırma
@@ -356,3 +366,36 @@ if __name__ == "__main__":
     for index, grup in enumerate(gruplu_listeler):
         print(f"Grup {index+1}: {grup}")
 
+
+def calculate_bert_embeddings_model(word_list, model_name="dbmdz/bert-base-turkish-cased"):
+    """   
+    Parameters:
+        word_list: array_like
+            If word list is provided in numpy array form, cosine similarity of combination of items of given list.
+        model_name: string, optional
+            If name of the pre-trained bert model is provided, it will be used to get word embedding with regard to pre-trained model.
+
+    Returns:
+        array_like
+            If word list, and pre-trained model name are provided, it returns word embeddings of words.
+    Note:
+        You must download and add the model.
+    """  
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name)
+    word_list1= list(word_list)
+    # Kelimeleri tokenize et
+    inputs = tokenizer(word_list1, return_tensors="pt", padding=True, truncation=True)
+
+    # Kelime gömme işlemi yap
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    # İlgili katmandaki gömme vektörlerini al
+    embedding_vectors = outputs.last_hidden_state[:, 0, :].numpy()
+    res=[]
+    # Her kelimenin gömme vektörünü yazdır
+    for word, vector in zip(word_list1, embedding_vectors):
+        res.append(vector)
+    res= np.array(res)
+    return res
