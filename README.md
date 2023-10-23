@@ -31,19 +31,29 @@ Here are some examples of how to use the functions provided in this code:
 ### Loading a FastText Model
 
 ```python
-ft = loadModel(r'cc.tr.300.bin')
+### Import module
+import stem_module as sm
+ 
+### Import fasttext model
+ft = sm.loadModel(r'cc.tr.300.bin')
 
 ### Calculating Cosine Similarity
 
-cosine_sim = cosine_similarity(vector1, vector2)
+cosine_sim = sm.cosine_similarity(vector1, vector2)
 
 ### Generating Dissimilar Word Lists
 
-dissimilar_words = generate_one_list(ft, word_distances, word_list)
+dissimilar_words = sm.generate_one_list(ft, word_distances, word_list)
 
 ### Generating Similar Word Lists
 
-similar_words = generate_similar_words(word_list, word_distances, 12)
+similar_words = sm.generate_similar_words(word_list, word_distances, 12)
+
+### Get word embeddings with BERT
+
+vector= sm.calculate_bert_embeddings_model(word_list)
+
+
 ```
 
 
