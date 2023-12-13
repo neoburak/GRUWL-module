@@ -9,9 +9,10 @@ This repository contains Python code for working with word embeddings using the 
 Before you begin, ensure you have met the following requirements:
 
 - Python 3.x
-- FastText library
+- FastText
 - Numpy
 - Pandas
+- Gensim
 
 You can download the Turkish pre-trained Word2Vec model from here: https://github.com/akoksal/Turkish-Word2Vec
 You can download the Turkish pre-trained fastText model from here: https://fasttext.cc/docs/en/crawl-vectors.html
