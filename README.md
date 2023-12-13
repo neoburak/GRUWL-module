@@ -26,8 +26,8 @@ To get started, follow these steps:
 a.  pip install fasttext
 b.  pip install numpy
 c.  pip install pandas
-d.  pip install gensim
-4. Run the code using Python.
+
+3. Run the code using Python.
 
 ## Usage
 
