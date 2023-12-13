@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[32]:
+# In[3]:
 
 
 import numpy as np 
@@ -13,8 +13,7 @@ from itertools import permutations,combinations
 from numpy.linalg import norm
 import math
 import random
-from transformers import AutoModel, AutoTokenizer, BertTokenizer
-import torch
+from gensim.models import KeyedVectors
 
 
 # In[2]:
@@ -37,8 +36,6 @@ def loadModel(keyword):
 
 
 # In[3]:
-
-
 
 
 def getWordList(keyword):
@@ -112,7 +109,7 @@ def cos_similarity_function(vector_or_matrix_1, matrix=None):
         return np.dot(vector, matrix.T) / (np.linalg.norm(vector) * np.linalg.norm(matrix, axis=1))
 
 
-# In[37]:
+# In[6]:
 
 
 if __name__ == "__main__":
@@ -121,7 +118,7 @@ if __name__ == "__main__":
     word_list= getWordList("words2.txt") 
 
 
-# In[38]:
+# In[7]:
 
 
 if __name__ == "__main__":
@@ -129,7 +126,7 @@ if __name__ == "__main__":
     word_distances = cos_similarity_function(vectors)
 
 
-# In[6]:
+# In[8]:
 
 
 def cosine_similarity(vector1, vector2):
@@ -151,16 +148,12 @@ def cosine_similarity(vector1, vector2):
     return dot_product / (norm_1 * norm_2)
 
 
-# In[7]:
+# In[11]:
 
 
 def generate_one_list(model_name,word_distances,word_list,size_of_list=12,cosine_similarity_value=0.30):
     """   
     Parameters:
-        model_name: object
-            If pre-trained model name is provided, model including word embedding vectors can be used to
-            generate given size and cosine similarity value.
-            
         word_distances: array_like
             If word distances which was generated with "cos_similarity_function" function is provided in numpy array form, 
             word distances can be used to estimated the furthest item with regard to cosine similarity value parameter.
@@ -177,6 +170,7 @@ def generate_one_list(model_name,word_distances,word_list,size_of_list=12,cosine
             number  of  items with regard to cosine similarity value.
         
     """  
+    
     temp1=[]
     temp2=[]
     u=[]
@@ -203,7 +197,7 @@ def generate_one_list(model_name,word_distances,word_list,size_of_list=12,cosine
     return u
 
 
-# In[57]:
+# In[12]:
 
 
 if __name__ == "__main__":
@@ -224,7 +218,7 @@ def unique_values_in_list_of_lists(word_list):
     """   
     Parameters:
         word_list: array_like
-            If word list is provided in numpy array form, dissimilar word list is generated from the given word list.
+            If word list is provided in numpy array form, dissimlar word list is generated from the given word list.
 
     Returns:
         array_like
@@ -237,31 +231,16 @@ def unique_values_in_list_of_lists(word_list):
     return result
 
 
-# In[13]:
-
-
-# finally crate lists contain 10 items
-if __name__ == "__main__":
-
-    x=[]
-    w=[]
-    x= unique_values_in_list_of_lists(res)[0]
-    #x1= x[:50]
-
-    w=[x[i:i+20] for i in range(0, len(x), 10)]
-    w
-
-
-# In[14]:
+# In[27]:
 
 
 #get nearest
-def generate_similar_words(word_list,word_distances,size_of_list=12,print_values=False):
+def generate_similar_words(word_list,word_distances,size_of_list=12,print_values=True):
 
     """   
     Parameters:
         word_list: array_like
-            If word list is provided in numpy array form, similar word list is generated from the given word list.
+            If word list is provided in numpy array form, simlar word list is generated from the given word list.
         word_distances: array_like
             If word distances which was generated with "cos_similarity_function" function is provided in numpy array form, 
             word distances can be used to estimated the nearest items.
@@ -289,20 +268,19 @@ def generate_similar_words(word_list,word_distances,size_of_list=12,print_values
         return list(dist_words_dict.values())
 
 
-# In[15]:
+# In[28]:
 
 
 if __name__ == "__main__":
-    print(generate_similar_words(word_list,word_distances,12))
+    print(generate_similar_words(word_list,word_distances,12,print_values=False))
 
 
 # ## Diagnosis:
 
-# In[50]:
+# In[ ]:
 
 
-def show_diagnosis(model_name,word_list,sort_ascending=False):
-    temp=[]
+def show_diagnosis(similars_word2vec,word2vec_model,show_cos_values=True):
     """   
     Parameters:
         word_list: array_like
@@ -312,21 +290,98 @@ def show_diagnosis(model_name,word_list,sort_ascending=False):
             If word list, distances between words in the form of numpy array and provided, returns similar list determined 
             number  of  items.
     NOTE: before using show_diagnosis function you must 
-    """  
-    if sort_ascending== False:
-        for a,b in combinations(word_list,2):
-          temp.append((a,b,cosine_similarity(model_name[a],model_name[b])))
-        return temp
-    if sort_ascending == True:
-        for a,b in combinations(word_list,2):
-          temp.append((a,b,cosine_similarity(model_name[a],model_name[b])))
-        sorted_items =  sorted(temp, key=lambda x: x[2])
-        return sorted_items
+    """      
+    similarities = []
+    for index in range(len(similars_word2vec)):
+        current_similarity = []  
+        for a, b in combinations(similars_word2vec[index], 2):
+            similarity = sm.cosine_similarity(word2vec_model[a], word2vec_model[b])
+            if(show_cos_values==True):
+                current_similarity.append((a, b, similarity))
+            else:
+                 current_similarity.append((a, b))
+        similarities.append(current_similarity)
+    return similarities
 
 
-# ## Sonuçları Görüntüleme ve Yazdırma
+# ## Word2Vec
 
 # In[ ]:
+
+
+def loadword2vecmodel(keyword):
+    """   
+    Parameters:
+        keyword: string
+            If keyword which is fasttext pre-trained model path or name of model such as "trmodelword2vec.bin" is provided, 
+            word2vec model can be used for further operations.
+    Returns:
+        object:
+            If pre-trained model name is provided, returns word2vec model including word embedding vectors can be used for
+            further operations.
+            
+    NOTE: if you have the model. It should be in the same folder with your python notebook.
+    """   
+    return KeyedVectors.load_word2vec_format(keyword, binary=True)
+
+
+# In[ ]:
+
+
+def word2vec_checkword_list(word_list,word2vec_model):
+    """   
+    Parameters:
+        word_list: list
+            If word list is provided for the word2vec model, it will be controlled to check whether word list items in
+            word2vec model's corpus and word list.
+        word2vec_model: object
+            If keyword which is word2vec pre-trained model path or name of model is provided, it will be controlled to check whether word list items in
+            word2vec model's corpus and word list.
+    Returns:
+        word2vec_word_list: list
+            If pre-trained model name and word list are provided, returns a list including common items that word list and word2vec corpus.
+            
+    NOTE: if you have the model. It should be in the same folder with your python notebook.
+    """   
+    res_word2vec=[]
+    word2vec_word_list=[]
+    for i in word_list:
+        if i in word2vec_model:
+            res_word2vec.append((i,word2vec_model[i]))
+            word2vec_word_list.append(i)
+
+        else:
+            continue
+    word2vec_word_list= np.array(word2vec_word_list)  
+    return word2vec_word_list
+
+
+# ## Save results as .txt File
+
+# In[ ]:
+
+
+def save_results(filename,liste):
+    """   
+    Parameters:
+        filename: string
+            If filename is provided in string form, the name of the file is named with filename.
+        liste: list
+            If list is provided, list items are write a .txt file.
+
+    Returns:
+        .txt file
+            If filename, and number of lists are provided, it returns grouped lists.
+    """ 
+    with open(filename, 'w') as file:
+        for items in liste[:]:  
+            for i in range(len(items)):
+                file.write(str(items[i]) + "\n")
+
+
+# ## Creating and Grouping Lists
+
+# In[33]:
 
 
 def making_list_and_print(word_list, num_of_lists=20, write_lists= False):
@@ -353,7 +408,7 @@ def making_list_and_print(word_list, num_of_lists=20, write_lists= False):
         return res
 
 
-# In[ ]:
+# In[34]:
 
 
 # Örnek kullanım:
@@ -367,35 +422,8 @@ if __name__ == "__main__":
         print(f"Grup {index+1}: {grup}")
 
 
-def calculate_bert_embeddings_model(word_list, model_name="dbmdz/bert-base-turkish-cased"):
-    """   
-    Parameters:
-        word_list: array_like
-            If word list is provided in numpy array form, cosine similarity of combination of items of given list.
-        model_name: string, optional
-            If name of the pre-trained bert model is provided, it will be used to get word embedding with regard to pre-trained model.
+# In[ ]:
 
-    Returns:
-        array_like
-            If word list, and pre-trained model name are provided, it returns word embeddings of words.
-    Note:
-        You must download and add the model.
-    """  
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModel.from_pretrained(model_name)
-    word_list1= list(word_list)
-    # Kelimeleri tokenize et
-    inputs = tokenizer(word_list1, return_tensors="pt", padding=True, truncation=True)
 
-    # Kelime gömme işlemi yap
-    with torch.no_grad():
-        outputs = model(**inputs)
 
-    # İlgili katmandaki gömme vektörlerini al
-    embedding_vectors = outputs.last_hidden_state[:, 0, :].numpy()
-    res=[]
-    # Her kelimenin gömme vektörünü yazdır
-    for word, vector in zip(word_list1, embedding_vectors):
-        res.append(vector)
-    res= np.array(res)
-    return res
+
