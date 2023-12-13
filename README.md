@@ -73,6 +73,7 @@ fastText is licensed under the MIT License
 - FastText
 - Numpy
 - Pandas
+- Gensim 
 ## Author
 - Barbaros YET
 - GitHub: https://github.com/byet
