@@ -13,6 +13,10 @@ Before you begin, ensure you have met the following requirements:
 - Numpy
 - Pandas
 
+You can download the Turkish pre-trained Word2Vec model from here: https://github.com/akoksal/Turkish-Word2Vec
+You can download the Turkish pre-trained fastText model from here: https://fasttext.cc/docs/en/crawl-vectors.html
+
+
 ## Getting Started
 
 To get started, follow these steps:
@@ -22,7 +26,8 @@ To get started, follow these steps:
 a.  pip install fasttext
 b.  pip install numpy
 c.  pip install pandas
-3. Run the code using Python.
+d.  pip install gensim
+4. Run the code using Python.
 
 ## Usage
 
@@ -49,10 +54,9 @@ dissimilar_words = sm.generate_one_list(ft, word_distances, word_list)
 
 similar_words = sm.generate_similar_words(word_list, word_distances, 12)
 
-### Get word embeddings with BERT
+### Compare Word2Vec Corpus and Word List
 
-vector= sm.calculate_bert_embeddings_model(word_list)
-
+word2vec_list= sm.word2vec_checkword_list(word_list,word2vec_model)
 
 ```
 
