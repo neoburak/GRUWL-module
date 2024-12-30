@@ -1,4 +1,4 @@
-# STEM MODULE
+# GRUWL MODULE
 
 # Word Embedding Operations with FastText for Episodic Memory Studies
 
